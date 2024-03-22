@@ -19,17 +19,17 @@ OUT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "run", "trai
 # Training Parameters
 OPTIMIZER_WD_ONLY_ON_WEIGHTS = True  # for multi-gpu training please make it False
 START_WITH_EVAL = True  # if True it will star with evaluation
-BATCH_SIZE = 3  # set here the batch size
-GRAD_ACUMM_STEPS = 84  # set here the grad accumulation steps
+BATCH_SIZE = 2  # set here the batch size
+GRAD_ACUMM_STEPS = 126  # set here the grad accumulation steps
 # Note: we recommend that BATCH_SIZE * GRAD_ACUMM_STEPS need to be at least 252 for more efficient training. You can increase/decrease BATCH_SIZE but then set GRAD_ACUMM_STEPS accordingly.
 
 # Define here the dataset that you want to use for the fine-tuning on.
 config_dataset = BaseDatasetConfig(
     formatter="ljspeech",
     dataset_name="ljspeech",
-    path="/raid/datasets/LJSpeech-1.1_24khz/",
-    meta_file_train="/raid/datasets/LJSpeech-1.1_24khz/metadata.csv",
-    language="en",
+    path="D:\\Work\\AI\\Data\\25hours",
+    meta_file_train="metadata.csv",
+    language="vi",
 )
 
 # Add here the configs of the datasets
@@ -59,7 +59,8 @@ TOKENIZER_FILE_LINK = "https://coqui.gateway.scarf.sh/hf-coqui/XTTS-v2/main/voca
 XTTS_CHECKPOINT_LINK = "https://coqui.gateway.scarf.sh/hf-coqui/XTTS-v2/main/model.pth"
 
 # XTTS transfer learning parameters: You we need to provide the paths of XTTS model checkpoint that you want to do the fine tuning.
-TOKENIZER_FILE = os.path.join(CHECKPOINTS_OUT_PATH, os.path.basename(TOKENIZER_FILE_LINK))  # vocab.json file
+# TOKENIZER_FILE = os.path.join(CHECKPOINTS_OUT_PATH, os.path.basename(TOKENIZER_FILE_LINK))  # vocab.json file
+TOKENIZER_FILE = os.path.join(CHECKPOINTS_OUT_PATH, 'merged.json')
 XTTS_CHECKPOINT = os.path.join(CHECKPOINTS_OUT_PATH, os.path.basename(XTTS_CHECKPOINT_LINK))  # model.pth file
 
 # download XTTS v2.0 files if needed
@@ -72,7 +73,7 @@ if not os.path.isfile(TOKENIZER_FILE) or not os.path.isfile(XTTS_CHECKPOINT):
 
 # Training sentences generations
 SPEAKER_REFERENCE = [
-    "./tests/data/ljspeech/wavs/LJ001-0002.wav"  # speaker reference to be used in training test sentences
+    "D:\\Work\\AI\\Data\\25hours\\wavs\\0\\0\\00000.wav"  # speaker reference to be used in training test sentences
 ]
 LANGUAGE = config_dataset.language
 
@@ -112,7 +113,7 @@ def main():
         batch_size=BATCH_SIZE,
         batch_group_size=48,
         eval_batch_size=BATCH_SIZE,
-        num_loader_workers=8,
+        num_loader_workers=6,
         eval_split_max_size=256,
         print_step=50,
         plot_step=100,
@@ -132,12 +133,12 @@ def main():
         lr_scheduler_params={"milestones": [50000 * 18, 150000 * 18, 300000 * 18], "gamma": 0.5, "last_epoch": -1},
         test_sentences=[
             {
-                "text": "It took me quite a long time to develop a voice, and now that I have it I'm not going to be silent.",
+                "text": "Một con gà đẻ ra ba quả trứng.",
                 "speaker_wav": SPEAKER_REFERENCE,
                 "language": LANGUAGE,
             },
             {
-                "text": "This cake is great. It's so delicious and moist.",
+                "text": "Nó kêu rằng quác quác quác quạc quạc quạc.",
                 "speaker_wav": SPEAKER_REFERENCE,
                 "language": LANGUAGE,
             },
